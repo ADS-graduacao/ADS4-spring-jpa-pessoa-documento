@@ -28,24 +28,27 @@ public class PessoaService {
         return pessoaMapper.toDto(pessoaRepository.save(entidade));
     }
 
-//    public Pessoa alterar(Long id, Pessoa pessoa){
-//        Optional<Pessoa> busca = buscarPorId(id);
-//
-//        if (busca.isEmpty()){
-//            return null;
-//        }
-//
-//        Pessoa cad = busca.get();
-//        cad.setNome(pessoa.getNome());
-//        cad.setEmail(pessoa.getEmail());
-//        cad.setDataNascimento(pessoa.getDataNascimento());
-//        cad.setDocumento(pessoa.getDocumento());
-//
-//        return pessoaRepository.save(cad);
-//    }
+    public PessoaDto alterar(Long id, PessoaDto pessoaDto){
+        Optional<Pessoa> pessoaExistente = pessoaRepository.findById(id);
 
-    public List<Pessoa> listarTodas() {
-        return pessoaRepository.findAll();
+        if (pessoaExistente.isEmpty()){
+            return null;
+        }
+
+        Pessoa pessoaAtualizada = pessoaMapper.toEntity(pessoaDto);
+        pessoaAtualizada.setId(id);
+
+        if (pessoaAtualizada.getDocumento() != null){
+            pessoaAtualizada.getDocumento().setPessoa(pessoaAtualizada);
+        }
+
+        return pessoaMapper.toDto(pessoaRepository.save(pessoaAtualizada));
+    }
+
+    public List<PessoaDto> listarTodas() {
+        return pessoaRepository.findAll().stream()
+                .map(pessoaMapper::toDto)
+                .toList();
     }
 
     // O Optional ele pode ter algo ou pode estar vazio
@@ -61,20 +64,24 @@ public class PessoaService {
         pessoaRepository.deleteById(id);
     }
 
-    public Pessoa buscarPorEmail(String email) {
-        return pessoaRepository.findByEmail(email);
+    public PessoaDto buscarPorEmail(String email) {
+        return pessoaMapper.toDto(pessoaRepository.findByEmail(email));
     }
 
-    public List<Pessoa> buscarPorNome(String nome) {
-        return pessoaRepository.findByNomeLike("%" + nome + "%");
+    public List<PessoaDto> buscarPorNome(String nome) {
+        return pessoaRepository.findAll().stream()
+                .map(pessoaMapper::toDto)
+                .toList();
     }
 
-    public List<Pessoa> buscarPorNascidosAntes(LocalDate data) {
-        return pessoaRepository.findPessoasNascidasAntesDe(data);
+    public List<PessoaDto> buscarPorNascidosAntes(LocalDate data) {
+        return pessoaRepository.findAll().stream()
+                .map(pessoaMapper::toDto)
+                .toList();
     }
 
-    public Pessoa buscarPorCpfDoDocumento(String cpf) {
-        return pessoaRepository.findByCpfDoDocumento(cpf);
+    public PessoaDto buscarPorCpfDoDocumento(String cpf) {
+        return pessoaMapper.toDto(pessoaRepository.findByCpfDoDocumento(cpf));
     }
 
 }

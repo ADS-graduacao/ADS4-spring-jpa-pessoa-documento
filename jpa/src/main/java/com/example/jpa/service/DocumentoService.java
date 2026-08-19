@@ -1,6 +1,9 @@
 package com.example.jpa.service;
 
+import com.example.jpa.dto.DocumentoDto;
+import com.example.jpa.dto.mapper.DocumentoMapper;
 import com.example.jpa.entity.Documento;
+import com.example.jpa.entity.Pessoa;
 import com.example.jpa.repository.DocumentoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,44 +16,53 @@ import java.util.Optional;
 public class DocumentoService {
 
     private final DocumentoRepository documentoRepository;
+    private final DocumentoMapper documentoMapper;
 
-    public Documento salvar(Documento documento){
-        return documentoRepository.save(documento);
+    public DocumentoDto salvar(DocumentoDto documento){
+        return documentoMapper.toDto((documentoRepository.save
+                (documentoMapper.toEntity(documento))));
     }
 
-    public Documento alterar(Long id, Documento documento){
-        Optional<Documento> busca = buscarPorId(id);
+    public DocumentoDto alterar(Long id, DocumentoDto documentoDto){
+        Optional<Documento> documentoExistente = documentoRepository.findById(id);
 
-        if (busca.isEmpty()){
+        if (documentoExistente.isEmpty()){
             return null;
         }
 
-        Documento cad = busca.get();
-        cad.setCpf(documento.getCpf());
-        cad.setRg(documento.getRg());
+        Documento documentoAtualizado = documentoMapper.toEntity(documentoDto);
+        documentoAtualizado.setId(id);
 
-        return documentoRepository.save(cad);
+        return documentoMapper.toDto(documentoRepository.save(documentoAtualizado));
     }
 
-    public List<Documento> listarTodas() {
-        return documentoRepository.findAll();
+    public List<DocumentoDto> listarTodas() {
+        return documentoRepository.findAll().stream()
+                .map(documentoMapper::toDto)
+                .toList();
     }
 
     // O Optional ele pode ter algo ou pode estar vazio
-    public Optional<Documento> buscarPorId(Long id) {
-        return documentoRepository.findById(id);
+    public Optional<DocumentoDto> buscarPorId(Long id) {
+        Optional<Documento> documento = documentoRepository.findById(id);
+        if (documento.isEmpty()){
+            return Optional.empty();
+        }
+        return Optional.of(documentoMapper.toDto(documento.get()));
     }
 
     public void excluir(Long id) {
         documentoRepository.deleteById(id);
     }
 
-    public Documento buscarPorRG(String rg) {
-        return documentoRepository.findByRg(rg);
+    public DocumentoDto buscarPorRG(String rg) {
+        return documentoMapper.toDto(documentoRepository.findByRg(rg));
     }
 
-    public List<Documento> buscarPorNomePessoa(String nome) {
-        return documentoRepository.findByNomeDaPessoa(nome);
+    public List<DocumentoDto> buscarPorNomePessoa(String nome) {
+        return documentoRepository.findByNomeDaPessoa(nome).stream()
+                .map(documentoMapper::toDto)
+                .toList();
     }
 
 }

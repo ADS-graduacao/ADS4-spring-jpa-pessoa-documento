@@ -30,8 +30,8 @@ public class PessoaController {
 
 
     @GetMapping
-    public ResponseEntity<List<Pessoa>> listarTodas() {
-        List<Pessoa> pessoas = pessoaService.listarTodas();
+    public ResponseEntity<List<PessoaDto>> listarTodas() {
+        List<PessoaDto> pessoas = pessoaService.listarTodas();
         if (pessoas.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
@@ -52,8 +52,8 @@ public class PessoaController {
     }
 
     @GetMapping("/email")
-    public ResponseEntity<Pessoa> buscarPorEmail(@RequestParam String email) {
-        Pessoa pessoa = pessoaService.buscarPorEmail(email);
+    public ResponseEntity<PessoaDto> buscarPorEmail(@RequestParam String email) {
+        PessoaDto pessoa = pessoaService.buscarPorEmail(email);
         if (pessoa == null){
             return ResponseEntity.noContent().build();
         }
@@ -61,8 +61,8 @@ public class PessoaController {
     }
 
     @GetMapping("/nome")
-    public ResponseEntity<List<Pessoa>> buscarPorNome(@RequestParam String nome) {
-        List<Pessoa> pessoa = pessoaService.buscarPorNome(nome);
+    public ResponseEntity<List<PessoaDto>> buscarPorNome(@RequestParam String nome) {
+        List<PessoaDto> pessoa = pessoaService.buscarPorNome(nome);
         if (pessoa == null){
             return ResponseEntity.noContent().build();
         }
@@ -70,8 +70,8 @@ public class PessoaController {
     }
 
     @GetMapping("/nascimento-anterior")
-    public ResponseEntity<List<Pessoa>> buscarPorDataAnterior(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
-        List<Pessoa> pessoa = pessoaService.buscarPorNascidosAntes(data);
+    public ResponseEntity<List<PessoaDto>> buscarPorDataAnterior(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+        List<PessoaDto> pessoa = pessoaService.buscarPorNascidosAntes(data);
         if (pessoa == null) {
             return ResponseEntity.noContent().build();
         }
@@ -79,21 +79,21 @@ public class PessoaController {
     }
 
     @GetMapping("/cpf")
-    public ResponseEntity<Pessoa> buscarPorCpfDoDocumento(@RequestParam String cpf) {
-        Pessoa pessoa = pessoaService.buscarPorCpfDoDocumento(cpf);
-        if (pessoa == null){
+    public ResponseEntity<PessoaDto> buscarPorCpfDoDocumento(@RequestParam String cpf) {
+        PessoaDto pessoaAtualizada = pessoaService.buscarPorCpfDoDocumento(cpf);
+        if (pessoaAtualizada == null){
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.status(HttpStatus.OK).body(pessoa);
+        return ResponseEntity.status(HttpStatus.OK).body(pessoaAtualizada);
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Pessoa> alterar(@PathVariable Long id, @RequestBody Pessoa pessoa) {
-//        Pessoa modificada = pessoaService.alterar(id, pessoa);
-//        if (modificada == null) {
-//            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-//        }
-//        return ResponseEntity.status(HttpStatus.CREATED).body(modificada);
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<PessoaDto> alterar(@PathVariable Long id, @RequestBody PessoaDto pessoa) {
+        PessoaDto modificada = pessoaService.alterar(id, pessoa);
+        if (modificada == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(modificada);
+    }
 
 }
