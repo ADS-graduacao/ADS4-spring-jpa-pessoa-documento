@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record LivroDto(
         Long id,
@@ -21,6 +22,8 @@ public record LivroDto(
         Double preco,
 
         Long idAutor,
-        String nomeAutor
+        String nomeAutor,
+
+        List<CategoriaDto>categorias
 ) {
 }
